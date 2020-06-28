@@ -7,6 +7,7 @@ const Course = mongoose.model('Course', new mongoose.Schema({
         required:true,
         minlength:5,
         maxlength:50
+		//enum : ['Hello']
     },
     price:{
         type:Number,
