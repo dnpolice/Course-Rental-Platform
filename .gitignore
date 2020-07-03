@@ -1,0 +1,4 @@
+/node_modules
+logfile.log
+unCaughtExceptions.log
+/config/custom-environment-variables.json
