@@ -1,0 +1,2 @@
+# Online-Store-Backend
+Designed the backend of an online store in node.js using MongoDB as the database. Custom endpoints were developed to correspond to specific website features. The wesbsite was made secure through a combination of hashing passwords with a custom key and JSON Web Tokens restricting access to specific endpoints. Error handling was implimented with loggers to cover both async and synchronous errors that occur anywhere throughout the website.
