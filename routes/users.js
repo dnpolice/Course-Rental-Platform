@@ -5,7 +5,6 @@ const config = require('config');
 const _ = require('lodash');
 const { User, validate } = require('../models/user');
 const express = require('express');
-const { endsWith } = require('lodash');
 const router = express.Router();
 
 router.get('/me', auth, async(req, res) =>{

@@ -1,7 +1,9 @@
 const logger = require('./logging');
 const mongoose = require('mongoose');
+const config = require('config');
 
 module.exports = function(){
-    mongoose.connect('mongodb://localhost/dpData', {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false})
-    .then(() => logger.info('Connected to MongoDB...'));
+    const db = config.get('db');
+    mongoose.connect(db, {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false})
+    .then(() => logger.info(`Connected to ${db}...`));
 }
