@@ -1,3 +1,4 @@
 {
-    "jwtPrivateKey":"dpData_jwtPrivateKey"
+    "jwtPrivateKey":"dpData_jwtPrivateKey",
+    "db": "db"
 }
