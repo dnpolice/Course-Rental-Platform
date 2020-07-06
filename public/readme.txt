@@ -1,1 +1,1 @@
-This is a readme file
+Online Course Rental Platform
