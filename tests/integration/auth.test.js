@@ -19,7 +19,7 @@ describe('auth middleware', ()=> {
         return request(server)
         .post('/api/courses')
         .set('x-auth-token', token)
-        .send({ name: 'course1', price: 5 });
+        .send({ name: 'course1', dailyRentalRate: 100, numberInStock: 100 });
     }
 
     beforeEach(() => {

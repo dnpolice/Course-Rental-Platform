@@ -28,7 +28,7 @@ describe('/api/courses', () => {
 
     describe('GET /:id', () => {
         it('should return course if valid id is passed', async () => {
-            const course = new Course({ name: 'course1', price: 5});
+            const course = new Course({ name: 'course1', numberInStock: 200, dailyRentalRate: 300 });
             await course.save();
 
             const res = await request(server).get('/api/courses/' + course._id);
@@ -52,19 +52,21 @@ describe('/api/courses', () => {
 
         let token;
         let name;
-        let price;
+        let numberInStock;
+        let dailyRentalRate;
 
         const exec = async () => {
             return await request(server)
             .post('/api/courses')
             .set('x-auth-token', token)
-            .send({ name , price });
+            .send({ name , numberInStock, dailyRentalRate });
         }
 
         beforeEach(() => {
             token = new User().generateAuthToken();
             name = 'course1';
-            price = 5;
+            numberInStock = 200;
+            dailyRentalRate = 300;
         });
 
         it('should save the course if it is valid', async () => {
@@ -99,16 +101,32 @@ describe('/api/courses', () => {
             expect(res.status).toBe(400);
         });
 
-        it('should return 400 if price is less than 0 characters', async () => {
-            price = -1;
+        it('should return 400 if numberInStock is less than 0 characters', async () => {
+            numberInStock = -1;
 
             const res = await exec();
 
             expect(res.status).toBe(400);
         });
 
-        it('should return 400 if price is more than 500 characters', async () => {
-            price = 600;
+        it('should return 400 if numberInStock is more than 500 characters', async () => {
+            numberInStock = 600;
+
+            const res = await exec();
+
+            expect(res.status).toBe(400);
+        });
+
+        it('should return 400 if price is less than 0 characters', async () => {
+            dailyRentalRate = -1;
+
+            const res = await exec();
+
+            expect(res.status).toBe(400);
+        });
+
+        it('should return 400 if price is more than 300 characters', async () => {
+            dailyRentalRate = 400;
 
             const res = await exec();
 
@@ -120,14 +138,16 @@ describe('/api/courses', () => {
 
             expect(res.body).toHaveProperty('_id');
             expect(res.body).toHaveProperty('name', name);
-            expect(res.body).toHaveProperty('price', price);
+            expect(res.body).toHaveProperty('numberInStock', numberInStock);
+            expect(res.body).toHaveProperty('dailyRentalRate', dailyRentalRate);
         });
     });
 
     describe('PUT /', () => {
         let token;
         let newName;
-        let newPrice;
+        let newNumberInStock;
+        let newDailyRentalRate;
         let course;
         let id;
 
@@ -135,17 +155,18 @@ describe('/api/courses', () => {
             return await request(server)
                 .put('/api/courses/' + id)
                 .set('x-auth-token', token)
-                .send({ name: newName, price: newPrice });
+                .send({ name: newName, dailyRentalRate: newDailyRentalRate, numberInStock: newNumberInStock });
         }
 
         beforeEach(async () => {
-            course = new Course({ name: 'course1', price: 5 });
+            course = new Course({ name: 'course1', dailyRentalRate: 100, numberInStock: 100 });
             await course.save();
 
             token = new User().generateAuthToken();
             id = course._id;
             newName = 'updatedName';
-            newPrice = 50;
+            newNumberInStock = 200;
+            newDailyRentalRate = 200;
         });
 
         it('should return 401 if client is not logged on', async () => {
@@ -172,21 +193,38 @@ describe('/api/courses', () => {
             expect(res.status).toBe(400);
         });
 
-        it('should return 400 if price is more than 500', async () =>{
-            newPrice = 501;
+        it('should return 400 if numberInStock is more than 500', async () =>{
+            newNumberInStock = 501;
 
             const res = await exec();
             
             expect(res.status).toBe(400);
         });
 
-        it('should return 400 if price is more than 500', async () =>{
-            newPrice = -10;
+        it('should return 400 if numberInStock is less than 500', async () =>{
+            newNumberInStock = -10;
 
             const res = await exec();
             
             expect(res.status).toBe(400);
         });
+
+        it('should return 400 if dailyRentalRate is more than 500', async () =>{
+            newDailyRentalRate = 501;
+
+            const res = await exec();
+            
+            expect(res.status).toBe(400);
+        });
+
+        it('should return 400 if dailyRentalRate is less than 500', async () =>{
+            newDailyRentalRate = -10;
+
+            const res = await exec();
+            
+            expect(res.status).toBe(400);
+        });
+
 
         it('should return 404 if id is invalid', async () => {
             id = 1;
@@ -215,10 +253,11 @@ describe('/api/courses', () => {
         it('should update the course if input is valid', async () => {
             await exec();
 
-            const updatedCourse = await Course.findById(course.id);
-
+            const updatedCourse = await Course.findOne({_id : course.id});
+            
             expect(updatedCourse.name).toBe(newName);
-            expect(updatedCourse.price).toBe(newPrice);
+            expect(updatedCourse.dailyRentalRate).toBe(newDailyRentalRate);
+            expect(updatedCourse.numberInStock).toBe(newNumberInStock);
         });
 
         it('should return the updated course course is valid', async () => {
@@ -226,7 +265,8 @@ describe('/api/courses', () => {
 
             expect(res.body).toHaveProperty('_id');
             expect(res.body).toHaveProperty('name', newName);
-            expect(res.body).toHaveProperty('price', newPrice);
+            expect(res.body).toHaveProperty('dailyRentalRate', newDailyRentalRate);
+            expect(res.body).toHaveProperty('numberInStock', newNumberInStock);
         });
     });
 
@@ -244,7 +284,7 @@ describe('/api/courses', () => {
 
 
         beforeEach(async () => {
-            course = new Course({ name: 'course1', price: 5});
+            course = new Course({ name: 'course1', dailyRentalRate: 100, numberInStock: 100 });
             await course.save();
             
             id = course._id;
@@ -286,9 +326,9 @@ describe('/api/courses', () => {
         it('should delete the course if input is valid', async () => {
             await exec();
 
-            const genreInDb = await Course.findById(id);
+            const courseInDb = await Course.findById(id);
 
-            expect(genreInDb).toBeNull();
+            expect(courseInDb).toBeNull();
         });
 
         it('should return the removed course', async () => {
@@ -296,7 +336,8 @@ describe('/api/courses', () => {
 
             expect(res.body).toHaveProperty('_id', course._id.toHexString());
             expect(res.body).toHaveProperty('name', course.name);
-            expect(res.body).toHaveProperty('price', course.price);
+            expect(res.body).toHaveProperty('dailyRentalRate', course.dailyRentalRate);
+            expect(res.body).toHaveProperty('numberInStock', course.numberInStock);
         });
     });
 });

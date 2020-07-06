@@ -2,7 +2,6 @@ const auth = require('../middleware/auth')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const _ = require('lodash');
 const { User, validate } = require('../models/user');
 const express = require('express');
 const router = express.Router();
@@ -19,14 +18,24 @@ router.post('/', async (req, res) => {
     let user = await User.findOne({email : req.body.email});
     if (user) return res.status(400).send('User already registered.');
 
-    user = new User(_.pick(req.body, ['username', 'email', 'password', 'isAdmin']));
+    user = new User({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+        isAdmin: req.body.isAdmin
+    });
+
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
 
     user = await user.save();
 
     const token = user.generateAuthToken();
-    res.header('x-auth-token', token).send(_.pick(user, ['_id','username', 'email']));
+    res.header('x-auth-token', token).send({
+        _id: user._id,
+        email: user.email,
+        username: user.username
+    });
     //inforce password complexity with joi password complexity
 });
 
